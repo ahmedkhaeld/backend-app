@@ -60,3 +60,26 @@ func (app *application) getAllGenres(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func (app *application) allMoviesByGenre(w http.ResponseWriter, r *http.Request) {
+	// get all the params from the request
+	params := httprouter.ParamsFromContext(r.Context())
+	// extract the id from the params
+	genreID, err := strconv.Atoi(params.ByName("genre_id"))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	// call the database to fetch list of all available movies by genre
+	movies, err := app.models.DB.All(genreID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	err = app.writeJSON(w, http.StatusOK, movies, "movies")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+}
